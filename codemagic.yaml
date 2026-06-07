@@ -2,7 +2,7 @@ workflows:
   testFlight:
     name: "Ios Release"
     integrations:
-      app_store_connect: ZOUHAIR MOUFARAJ
+      app_store_connect: Ayoub Es-sedraouy
     environment:
       flutter: 3.41.0
       ios_signing:
@@ -25,7 +25,7 @@ workflows:
     publishing:
       email:
         recipients:
-          - moufarijamix50@gmail.com
+          - zouhiramix50@gmail.com
         notify:
           success: true
           failure: true
