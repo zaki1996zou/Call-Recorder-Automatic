@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../l10n/locale_scope.dart';
+import '../../services/interstitial_ad_gate_service.dart';
 import '../../services/rewarded_ad_gate_service.dart';
 import 'recording_type.dart';
 
@@ -14,12 +15,20 @@ Future<RecordingType?> showCallNoteTypeSheet(BuildContext context) {
     builder: (context) {
       final l10n = context.l10n;
 
+      void complete(RecordingType type) {
+        if (context.mounted) Navigator.pop(context, type);
+      }
+
       void selectType(RecordingType type) {
+        if (type == RecordingType.incomingNote) {
+          InterstitialAdGateService.instance.runBeforeCallNoteIncoming(
+            () => complete(type),
+          );
+          return;
+        }
         RewardedAdGateService.instance.runBeforeCallNoteType(
           type,
-          () {
-            if (context.mounted) Navigator.pop(context, type);
-          },
+          () => complete(type),
         );
       }
 

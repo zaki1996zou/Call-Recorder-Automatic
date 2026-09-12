@@ -1,23 +1,26 @@
 import 'package:flutter/foundation.dart';
 import 'package:multiads/multiads.dart';
 
+import '../models/recording_filter_tab.dart';
 import '../util/global.dart';
 
-/// Interstitial ad gates with independent every-other-attempt counters per action.
-///
-/// Pattern per gate: 1st direct, 2nd ad, 3rd direct, 4th ad, ...
-/// If the ad is unavailable, [onContinue] still runs immediately.
+/// Interstitial gates. Shows an ad when ready; otherwise [onContinue] runs now.
 class InterstitialAdGateService {
   InterstitialAdGateService._();
 
-  static final InterstitialAdGateService instance = InterstitialAdGateService._();
+  static final InterstitialAdGateService instance =
+      InterstitialAdGateService._();
 
   static const cancelGate = 'cancel';
-  static const deleteGate = 'delete';
-  static const shareGate = 'share';
   static const backGate = 'back';
+  static const callNoteAfterGate = 'call_note_after';
+  static const callNoteIncomingGate = 'call_note_incoming';
+  static const editGate = 'edit';
+  static const favoriteGate = 'favorite';
+  static const tabIncomingGate = 'tab_incoming';
+  static const tabOutgoingGate = 'tab_outgoing';
+  static const tabFavoritesGate = 'tab_favorites';
 
-  final _attempts = <String, int>{};
   bool _isShowing = false;
 
   void runBefore(String gateId, VoidCallback onContinue) {
@@ -26,12 +29,7 @@ class InterstitialAdGateService {
       return;
     }
 
-    final count = (_attempts[gateId] ?? 0) + 1;
-    _attempts[gateId] = count;
-
-    final showAd = gAdsReady && gAds.hasInterstitials && count.isEven;
-
-    if (!showAd) {
+    if (!gAdsReady || !gAds.hasInterstitials) {
       onContinue();
       return;
     }
@@ -44,11 +42,35 @@ class InterstitialAdGateService {
     gAds.interInstance.showInterstitialAd();
   }
 
-  void runBeforeCancel(VoidCallback onContinue) => runBefore(cancelGate, onContinue);
+  void runBeforeCancel(VoidCallback onContinue) =>
+      runBefore(cancelGate, onContinue);
 
-  void runBeforeDelete(VoidCallback onContinue) => runBefore(deleteGate, onContinue);
+  void runBeforeBack(VoidCallback onContinue) =>
+      runBefore(backGate, onContinue);
 
-  void runBeforeShare(VoidCallback onContinue) => runBefore(shareGate, onContinue);
+  void runBeforeCallNoteAfter(VoidCallback onContinue) =>
+      runBefore(callNoteAfterGate, onContinue);
 
-  void runBeforeBack(VoidCallback onContinue) => runBefore(backGate, onContinue);
+  void runBeforeCallNoteIncoming(VoidCallback onContinue) =>
+      runBefore(callNoteIncomingGate, onContinue);
+
+  void runBeforeEdit(VoidCallback onContinue) =>
+      runBefore(editGate, onContinue);
+
+  void runBeforeFavorite(VoidCallback onContinue) =>
+      runBefore(favoriteGate, onContinue);
+
+  void runBeforeTab(RecordingFilterTab tab, VoidCallback onContinue) {
+    final gateId = switch (tab) {
+      RecordingFilterTab.incoming => tabIncomingGate,
+      RecordingFilterTab.outgoing => tabOutgoingGate,
+      RecordingFilterTab.favorites => tabFavoritesGate,
+      RecordingFilterTab.all => null,
+    };
+    if (gateId == null) {
+      onContinue();
+      return;
+    }
+    runBefore(gateId, onContinue);
+  }
 }

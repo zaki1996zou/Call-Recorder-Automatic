@@ -10,3 +10,4 @@ export 'src/models/multiads_config.dart';
 export 'src/networks/admob/admob_data.dart';
 export 'src/networks/applovin/applovin_data.dart';
 export 'src/networks/facebook/facebook_data.dart';
+export 'src/networks/ironsource/ironsource_data.dart';

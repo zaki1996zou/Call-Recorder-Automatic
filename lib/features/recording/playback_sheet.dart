@@ -10,6 +10,7 @@ import '../../l10n/locale_scope.dart';
 import '../../models/recording_item.dart';
 import '../../services/audio_player_service.dart';
 import '../../services/interstitial_ad_gate_service.dart';
+import '../../services/rewarded_ad_gate_service.dart';
 import '../../services/recording_storage_service.dart';
 import '../../services/recordings_repository.dart';
 import '../../widgets/permission_dialog.dart';
@@ -126,6 +127,12 @@ class _PlaybackSheetState extends State<PlaybackSheet> {
   }
 
   Future<void> _toggleFavorite() async {
+    InterstitialAdGateService.instance.runBeforeFavorite(() {
+      _performToggleFavorite();
+    });
+  }
+
+  Future<void> _performToggleFavorite() async {
     await widget.repository.toggleFavorite(_item.id);
     final updated = widget.repository.findById(_item.id);
     if (updated != null && mounted) {
@@ -135,6 +142,11 @@ class _PlaybackSheetState extends State<PlaybackSheet> {
   }
 
   Future<void> _edit() async {
+    InterstitialAdGateService.instance.runBeforeEdit(_performEdit);
+  }
+
+  Future<void> _performEdit() async {
+    if (!mounted) return;
     final updated = await showEditRecordingSheet(context, _item);
     if (updated == null || !mounted) return;
 
@@ -144,7 +156,7 @@ class _PlaybackSheetState extends State<PlaybackSheet> {
   }
 
   Future<void> _delete() async {
-    InterstitialAdGateService.instance.runBeforeDelete(_performDelete);
+    RewardedAdGateService.instance.runBeforeDelete(_performDelete);
   }
 
   Future<void> _performDelete() async {
@@ -163,7 +175,7 @@ class _PlaybackSheetState extends State<PlaybackSheet> {
   }
 
   Future<void> _removeMissingFromList() async {
-    InterstitialAdGateService.instance.runBeforeDelete(_performRemoveMissing);
+    RewardedAdGateService.instance.runBeforeDelete(_performRemoveMissing);
   }
 
   Future<void> _performRemoveMissing() async {
@@ -178,7 +190,7 @@ class _PlaybackSheetState extends State<PlaybackSheet> {
   }
 
   Future<void> _share() async {
-    InterstitialAdGateService.instance.runBeforeShare(_performShare);
+    RewardedAdGateService.instance.runBeforeShare(_performShare);
   }
 
   Future<void> _performShare() async {

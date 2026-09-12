@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:multiads/multiads.dart';
 
@@ -23,9 +24,12 @@ Future<void> initializeAdsIfAllowed() async {
     gAds = MultiAds(
       response.body,
       config: MultiAdsConfig(
-        admobTestDeviceIds: ['79738754EC81FA5F64972928128B2FFF'],
-        facebookTestingId: 'd1a0df1f-2528-4e41-a4d3-1b401ba14f7d',
-        enableLogs: true, // set false before release
+        admobTestDeviceIds: kDebugMode
+            ? const ['79738754EC81FA5F64972928128B2FFF']
+            : const [],
+        facebookTestingId:
+            kDebugMode ? 'd1a0df1f-2528-4e41-a4d3-1b401ba14f7d' : '',
+        enableLogs: kDebugMode,
       ),
     );
     await gAds.init();

@@ -8,7 +8,7 @@ import '../features/info/recording_consent_screen.dart';
 import '../l10n/locale_scope.dart';
 import '../services/ad_consent_service.dart';
 import '../services/app_preferences_service.dart';
-import '../services/interstitial_ad_gate_service.dart';
+import '../services/rewarded_ad_gate_service.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/drawer_icon.dart';
 
@@ -170,7 +170,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
   Future<void> _shareApp() async {
     final shareText = context.l10n.shareAppText;
     Navigator.pop(context);
-    InterstitialAdGateService.instance.runBeforeShare(() async {
+    RewardedAdGateService.instance.runBeforeShare(() async {
       await SharePlus.instance.share(
         ShareParams(text: shareText),
       );

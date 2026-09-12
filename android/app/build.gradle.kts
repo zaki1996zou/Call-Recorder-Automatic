@@ -24,7 +24,7 @@ android {
         applicationId = "com.recorder.callautomatic"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = maxOf(flutter.minSdkVersion, 23)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -41,4 +41,10 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation("com.google.android.gms:play-services-appset:16.0.2")
+    implementation("com.google.android.gms:play-services-ads-identifier:18.0.1")
+    implementation("com.google.android.gms:play-services-basement:18.3.0")
 }

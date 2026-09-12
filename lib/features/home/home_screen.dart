@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
@@ -133,9 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _startMeetingRecording() {
-    RewardedAdGateService.instance.runBeforeMeetingRecording(
-      _continueMeetingRecording,
-    );
+    unawaited(_continueMeetingRecording());
   }
 
   Future<void> _continueMeetingRecording() async {
@@ -145,6 +145,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _startCallNoteRecording() async {
+    InterstitialAdGateService.instance.runBeforeCallNoteAfter(
+      _continueCallNoteRecording,
+    );
+  }
+
+  Future<void> _continueCallNoteRecording() async {
+    if (!mounted) return;
     final type = await showCallNoteTypeSheet(context);
     if (type == null || !mounted) return;
 
@@ -184,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _deleteRecording(RecordingItem item) async {
-    InterstitialAdGateService.instance.runBeforeDelete(() {
+    RewardedAdGateService.instance.runBeforeDelete(() {
       _performDeleteRecording(item);
     });
   }
@@ -199,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _confirmAndDelete(RecordingItem item) async {
-    InterstitialAdGateService.instance.runBeforeDelete(() {
+    RewardedAdGateService.instance.runBeforeDelete(() {
       _performConfirmAndDelete(item);
     });
   }
@@ -221,16 +228,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _openPlayback(RecordingItem item) {
-    RewardedAdGateService.instance.runBeforePlayback(() {
-      if (!mounted) return;
-      showPlaybackSheet(
-        context,
-        item: item,
-        repository: _repository,
-        onDeleted: () => setState(() {}),
-        onUpdated: () => setState(() {}),
-      );
-    });
+    showPlaybackSheet(
+      context,
+      item: item,
+      repository: _repository,
+      onDeleted: () => setState(() {}),
+      onUpdated: () => setState(() {}),
+    );
   }
 
   void _onRecordingModeChanged(RecordingModePreference mode) {
@@ -265,7 +269,11 @@ class _HomeScreenState extends State<HomeScreen> {
           child: RecordingListTile(
             item: item,
             onTap: () => _openPlayback(item),
-            onFavoriteToggle: () => _repository.toggleFavorite(item.id),
+            onFavoriteToggle: () {
+              InterstitialAdGateService.instance.runBeforeFavorite(
+                () => _repository.toggleFavorite(item.id),
+              );
+            },
             onDelete: () => _confirmAndDelete(item),
           ),
         );
@@ -287,7 +295,11 @@ class _HomeScreenState extends State<HomeScreen> {
         onRecordMeeting: _startMeetingRecording,
         onRecordCallNote: _startCallNoteRecording,
         onItemTap: _openPlayback,
-        onFavoriteToggle: (item) => _repository.toggleFavorite(item.id),
+        onFavoriteToggle: (item) {
+          InterstitialAdGateService.instance.runBeforeFavorite(
+            () => _repository.toggleFavorite(item.id),
+          );
+        },
         onDelete: _confirmAndDelete,
         onDismissDelete: _deleteRecording,
         onConfirmDismissDelete: _confirmDismissDelete,
@@ -330,8 +342,18 @@ class _HomeScreenState extends State<HomeScreen> {
               child: BottomNavigationBar(
                 currentIndex: _currentTab.index,
                 onTap: (index) {
-                  setState(
-                    () => _currentTab = RecordingFilterTab.values[index],
+                  final next = RecordingFilterTab.values[index];
+                  if (next == _currentTab) return;
+                  void applyTab() {
+                    if (mounted) setState(() => _currentTab = next);
+                  }
+                  if (next == RecordingFilterTab.all) {
+                    applyTab();
+                    return;
+                  }
+                  InterstitialAdGateService.instance.runBeforeTab(
+                    next,
+                    applyTab,
                   );
                 },
                 type: BottomNavigationBarType.fixed,

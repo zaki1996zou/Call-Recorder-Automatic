@@ -452,7 +452,7 @@ const _fr = {
   'aboutDescription':
       'Enregistrez des réunions, des notes vocales et des résumés après '
           'appel avec votre microphone.',
-  'version': 'Version 1.0.0',
+  'version': 'Version 1.1.1',
 };
 
 const _en = {
@@ -599,7 +599,7 @@ const _en = {
           '• Organize your recordings and notes',
   'aboutDescription':
       'Record meetings, voice notes, and post-call summaries with your microphone.',
-  'version': 'Version 1.0.0',
+  'version': 'Version 1.1.1',
 };
 
 const _ar = {
@@ -740,7 +740,7 @@ const _ar = {
           '• تنظيم تسجيلاتك وملاحظاتك',
   'aboutDescription':
       'سجّل الاجتماعات والملاحظات الصوتية وملخصات ما بعد المكالمة بميكروفونك.',
-  'version': 'الإصدار 1.0.0',
+  'version': 'الإصدار 1.1.1',
 };
 
 const _es = {
@@ -889,5 +889,5 @@ const _es = {
           '• Organizar tus grabaciones y notas',
   'aboutDescription':
       'Graba reuniones, notas de voz y resúmenes tras llamadas con tu micrófono.',
-  'version': 'Versión 1.0.0',
+  'version': 'Versión 1.1.1',
 };

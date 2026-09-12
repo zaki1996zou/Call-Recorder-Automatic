@@ -10,12 +10,14 @@ import 'models/multiads_config.dart';
 import 'networks/admob/admob_ad.dart';
 import 'networks/applovin/applovin_ad.dart';
 import 'networks/facebook/facebook_ad.dart';
+import 'networks/ironsource/ironsource_ad.dart';
 
 class MultiAds {
   late final AdsData _adsData;
   late final AdmobAD _admobAD;
   late final ApplovinAD _applovinAD;
   late final FacebookAD _facebookAD;
+  late final IronsourceAD _ironsourceAD;
 
   final _activeNetworks = <String>{};
 
@@ -32,6 +34,7 @@ class MultiAds {
     _admobAD = AdmobAD(_adsData.admobData, config);
     _applovinAD = ApplovinAD(_adsData.applovinData, _adsData.settings);
     _facebookAD = FacebookAD(_adsData.facebookData, config);
+    _ironsourceAD = IronsourceAD(_adsData.ironsourceData, config);
     _fillActiveNetworks();
   }
 
@@ -60,6 +63,10 @@ class MultiAds {
     if (_activeNetworks.contains(Networks.facebook)) {
       await _facebookAD.init();
       Log.log("Facebook initialized");
+    }
+    if (_activeNetworks.contains(Networks.ironsource)) {
+      await _ironsourceAD.init();
+      Log.log("IronSource initialized");
     }
   }
 
@@ -126,6 +133,8 @@ class MultiAds {
         return _applovinAD;
       case Networks.facebook:
         return _facebookAD;
+      case Networks.ironsource:
+        return _ironsourceAD;
       default:
         Log.log("Unknown network '$network' — falling back to NoAds");
         return NoAds();
